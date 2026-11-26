@@ -1,0 +1,10 @@
+# Roblox place files (binary / huge, Studio cloud-saves these)
+*.rbxl
+*.rbxlx
+*.rbxl.lock
+*.rbxlx.lock
+*.rbxm
+# Rojo build output
+/build/
+# macOS
+.DS_Store
