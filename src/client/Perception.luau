@@ -54,18 +54,20 @@ function Perception.reset()
 	table.clear(lightSnapshots)
 end
 
-function Perception.apply(anomalyIds: { string })
+-- Always starts from the original room, so re-applying with a higher intensity
+-- never stacks on top of the previous one.
+function Perception.apply(view: { Anomalies.ViewEntry })
 	Perception.reset()
-	for _, id in anomalyIds do
-		local anomaly = Anomalies.byId[id]
+	for _, entry in view do
+		local anomaly = Anomalies.byId[entry.id]
 		if not anomaly then
-			warn("[Ashkew] Unknown anomaly", id)
+			warn("[Ashkew] Unknown anomaly", entry.id)
 			continue
 		end
 		local model = findObject(anomaly.objectId)
 		if model then
 			snapshot(model)
-			anomaly.apply(model)
+			anomaly.apply(model, math.clamp(entry.intensity, 0, 1))
 		end
 	end
 end

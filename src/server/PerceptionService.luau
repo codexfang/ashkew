@@ -13,7 +13,9 @@ local ClientReady = Remotes:WaitForChild("ClientReady") :: RemoteEvent
 
 local PerceptionService = {}
 
-local views: { [Player]: { string } } = {}
+type View = { Anomalies.ViewEntry }
+
+local views: { [Player]: View } = {}
 local ready: { [Player]: boolean } = {}
 local rng = Random.new()
 
@@ -26,9 +28,9 @@ end
 -- Picks an anomaly no other player currently has, so every view is different.
 local function pickUnusedAnomaly(): string
 	local used: { [string]: boolean } = {}
-	for _, ids in views do
-		for _, id in ids do
-			used[id] = true
+	for _, view in views do
+		for _, entry in view do
+			used[entry.id] = true
 		end
 	end
 
@@ -44,12 +46,12 @@ local function pickUnusedAnomaly(): string
 	return candidates[rng:NextInteger(1, #candidates)]
 end
 
-function PerceptionService.setView(player: Player, anomalyIds: { string })
-	views[player] = anomalyIds
+function PerceptionService.setView(player: Player, view: View)
+	views[player] = view
 	push(player)
 end
 
-function PerceptionService.getView(player: Player): { string }
+function PerceptionService.getView(player: Player): View
 	return views[player] or {}
 end
 
@@ -58,7 +60,7 @@ function PerceptionService.start()
 	ClientReady.OnServerEvent:Connect(function(player)
 		ready[player] = true
 		if not views[player] then
-			views[player] = { pickUnusedAnomaly() }
+			views[player] = { { id = pickUnusedAnomaly(), intensity = Anomalies.DECOY_INTENSITY } }
 		end
 		push(player)
 	end)

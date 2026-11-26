@@ -32,14 +32,15 @@ if RunService:IsStudio() then
 	debugLabel = label
 end
 
-PerceptionAssigned.OnClientEvent:Connect(function(anomalyIds: { string })
-	Perception.apply(anomalyIds)
+PerceptionAssigned.OnClientEvent:Connect(function(view: { Anomalies.ViewEntry })
+	Perception.apply(view)
 
 	if debugLabel then
 		local names = {}
-		for _, id in anomalyIds do
-			local anomaly = Anomalies.byId[id]
-			table.insert(names, if anomaly then anomaly.description else id)
+		for _, entry in view do
+			local anomaly = Anomalies.byId[entry.id]
+			local name = if anomaly then anomaly.description else entry.id
+			table.insert(names, string.format("%s (%d%%)", name, math.floor(entry.intensity * 100)))
 		end
 		debugLabel.Text = " [debug] view: " .. (if #names > 0 then table.concat(names, ", ") else "normal")
 	end
