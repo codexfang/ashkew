@@ -48,6 +48,8 @@ local function makeObject(objectId: string, parent: Instance, build: (model: Mod
 	if first then
 		model.PrimaryPart = first
 	end
+	-- Stream the whole object in at once so a client never sees half a model.
+	model.ModelStreamingMode = Enum.ModelStreamingMode.Atomic
 	CollectionService:AddTag(model, PERCEIVABLE_TAG)
 	model.Parent = parent
 	return model

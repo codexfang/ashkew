@@ -3,7 +3,12 @@
   "tree": {
     "$className": "DataModel",
     "ReplicatedStorage": {
-      "Shared": { "$path": "src/shared" }
+      "Shared": { "$path": "src/shared" },
+      "Remotes": {
+        "$className": "Folder",
+        "PerceptionAssigned": { "$className": "RemoteEvent" },
+        "ClientReady": { "$className": "RemoteEvent" }
+      }
     },
     "ServerScriptService": {
       "Server": { "$path": "src/server" }
