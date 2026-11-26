@@ -1,2 +1,5 @@
 -- Server entry point. Round logic gets wired in here as it is built.
-print("[Ashkew] Server started")
+local RoomBuilder = require(script.Parent.RoomBuilder)
+
+RoomBuilder.build()
+print("[Ashkew] Server started, room built")
