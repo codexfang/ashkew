@@ -17,33 +17,11 @@ type View = { Anomalies.ViewEntry }
 
 local views: { [Player]: View } = {}
 local ready: { [Player]: boolean } = {}
-local rng = Random.new()
 
 local function push(player: Player)
 	if ready[player] then
 		PerceptionAssigned:FireClient(player, views[player] or {})
 	end
-end
-
--- Picks an anomaly no other player currently has, so every view is different.
-local function pickUnusedAnomaly(): string
-	local used: { [string]: boolean } = {}
-	for _, view in views do
-		for _, entry in view do
-			used[entry.id] = true
-		end
-	end
-
-	local candidates = {}
-	for _, anomaly in Anomalies.list do
-		if not used[anomaly.id] then
-			table.insert(candidates, anomaly.id)
-		end
-	end
-	if #candidates == 0 then
-		return Anomalies.list[rng:NextInteger(1, #Anomalies.list)].id
-	end
-	return candidates[rng:NextInteger(1, #candidates)]
 end
 
 function PerceptionService.setView(player: Player, view: View)
@@ -55,13 +33,19 @@ function PerceptionService.getView(player: Player): View
 	return views[player] or {}
 end
 
+-- Puts every player back to seeing the normal room.
+function PerceptionService.clearAll()
+	for player in views do
+		views[player] = {}
+		push(player)
+	end
+end
+
 function PerceptionService.start()
 	-- Clients announce when their listener is connected, so nothing gets fired into the void.
 	ClientReady.OnServerEvent:Connect(function(player)
+		-- Late joiners see the normal room until the next stage rolls them in.
 		ready[player] = true
-		if not views[player] then
-			views[player] = { { id = pickUnusedAnomaly(), intensity = Anomalies.DECOY_INTENSITY } }
-		end
 		push(player)
 	end)
 
