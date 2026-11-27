@@ -7,7 +7,8 @@ local Config = {
 
 	IntermissionSeconds = 10,
 	StageSeconds = 45, -- how long the team has to find the real anomaly
-	VoteSeconds = 20,
+	VoteSeconds = 20, -- countdown that starts with the first vote of a stage
+	RevealSeconds = 4, -- pause after each stage to reveal the real anomaly
 	ResultSeconds = 6, -- how long the Escaped / Folded screen lasts
 	AnomaliesToEscape = 3,
 

@@ -16,7 +16,15 @@ local Config = require(ReplicatedStorage.Shared.Config)
 local PerceptionService = require(script.Parent.PerceptionService)
 local StageGenerator = require(script.Parent.StageGenerator)
 
+local Remotes = ReplicatedStorage:WaitForChild("Remotes")
+local StageResult = Remotes:WaitForChild("StageResult") :: RemoteEvent
+
 local RoundService = {}
+
+-- Server-side signals so other services (voting) can follow the round without
+-- RoundService needing to know about them.
+RoundService.StageStarted = Instance.new("BindableEvent")
+RoundService.StageEnded = Instance.new("BindableEvent")
 
 local rng = Random.new()
 local meter = 0
@@ -67,6 +75,7 @@ local function runStage(stage: StageGenerator.Stage): boolean
 	currentStage = stage
 	stageResult = nil
 	setState("Phase", "Stage")
+	RoundService.StageStarted:Fire()
 
 	local elapsed = 0
 	while stageResult == nil and elapsed < Config.StageSeconds and meter < Config.MeterMax do
@@ -83,6 +92,17 @@ local function runStage(stage: StageGenerator.Stage): boolean
 	if not correct then
 		setMeter(meter + Config.MeterWrongVote)
 	end
+	RoundService.StageEnded:Fire(correct)
+
+	-- Reveal the truth to everyone: which object it was and who was seeing it.
+	local real = Anomalies.byId[stage.realId]
+	StageResult:FireAllClients({
+		correct = correct,
+		objectId = if real then real.objectId else stage.realId,
+		description = if real then real.description else stage.realId,
+		holderName = stage.holder.DisplayName,
+	})
+	task.wait(Config.RevealSeconds)
 	return correct
 end
 

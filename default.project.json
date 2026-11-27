@@ -7,7 +7,10 @@
       "Remotes": {
         "$className": "Folder",
         "PerceptionAssigned": { "$className": "RemoteEvent" },
-        "ClientReady": { "$className": "RemoteEvent" }
+        "ClientReady": { "$className": "RemoteEvent" },
+        "CastVote": { "$className": "RemoteEvent" },
+        "VoteUpdate": { "$className": "RemoteEvent" },
+        "StageResult": { "$className": "RemoteEvent" }
       }
     },
     "ServerScriptService": {
